@@ -1065,6 +1065,46 @@ mo:zone rdf:type owl:DatatypeProperty ;
            rdfs:comment "Row index in source table/spreadsheet"@en .
 
 
+###  https://geochemistry.isi.edu/ontology/edit_history
+:edit_history rdf:type owl:ObjectProperty ;
+              rdfs:domain [ rdf:type owl:Class ;
+                            owl:unionOf ( :Sample
+                                          :Analysis
+                                          :Element
+                                        )
+                          ] ;
+              rdfs:range :EditEvent ;
+              rdfs:label "edit history"@en ;
+              rdfs:comment "Links a Sample/Analysis/Element to one :EditEvent per HMI save that touched it. Additive only, never overwritten or removed, so the full sequence of edits is recoverable by sorting on :updated_at."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/updated_by
+:updated_by rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain :EditEvent ;
+            rdfs:range xsd:anyURI ;
+            rdfs:label "updated by"@en ;
+            rdfs:comment "MinMod user URI (e.g. https://minmod.isi.edu/users/u/{username}) of who made this edit."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/updated_at
+:updated_at rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain :EditEvent ;
+            rdfs:range xsd:dateTime ;
+            rdfs:label "updated at"@en ;
+            rdfs:comment "Timestamp of this edit."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/changed_properties
+:changed_properties rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf owl:topDataProperty ;
+                    rdfs:domain :EditEvent ;
+                    rdfs:range xsd:anyURI ;
+                    rdfs:label "changed properties"@en ;
+                    rdfs:comment "URI(s) of the property/properties changed in this edit, e.g. 'https://geochemistry.isi.edu/ontology/grade'. Same convention as mo:property on mo:Reference."@en .
+
+
 ###  https://geochemistry.isi.edu/ontology/reference
 :reference rdf:type owl:ObjectProperty ;
            rdfs:subPropertyOf mo:reference ;
@@ -1252,6 +1292,12 @@ mo:zone rdf:type owl:DatatypeProperty ;
 :Analysis rdf:type owl:Class ;
           rdfs:label "Analysis"@en ;
           rdfs:comment "One lab run/spot. :element is not capped at one (a multi-element panel is a single :Analysis referencing several :Element instances), so the method/instrument/lab fields (:analytical_method, :instrument_type, :laboratory_location, :operating_conditions, :standards_used, :aggregation_method, :data_quality, :analysis_date) are stated once per run here rather than once per element. The per-element measured value lives on :Element instead (:grade/:grade_unit, alongside the pre-existing :detection_limit/:detection_limit_unit), since a single :Analysis can't unambiguously pair multiple scalar grades with multiple elements any other way. Verified against the live KG (2026-08-12): of 822,295 pre-fix per-element :Analysis nodes, these fields were 100% consistent within each of the 55,565 real runs — confirming this was pure duplication, not genuine per-element variation."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/EditEvent
+:EditEvent rdf:type owl:Class ;
+           rdfs:label "Edit Event"@en ;
+           rdfs:comment "One HMI edit to a :Sample/:Analysis/:Element node: who made it, when, and which properties changed. Append-only: a node accumulates one :EditEvent per save via :edit_history, so the full edit history is preserved rather than overwritten."@en .
 
 
 ###  https://geochemistry.isi.edu/ontology/Element
