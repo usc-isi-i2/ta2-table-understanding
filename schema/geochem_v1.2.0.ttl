@@ -139,8 +139,9 @@ mo:grade rdf:type owl:ObjectProperty ;
 ###  https://minmod.isi.edu/ontology/location_info
 mo:location_info rdf:type owl:ObjectProperty ;
                rdfs:subPropertyOf mo:mineral_site_objectproperty ;
+               rdfs:domain [ rdf:type owl:Class ; owl:unionOf ( mo:MineralSite :Sample ) ] ;
                rdfs:range mo:LocationInfo ;
-               rdfs:comment "A site may have more than one LocationInfo (e.g. multiple reported localities for the same deposit); no cardinality restriction is declared on mo:MineralSite for this property."@en ;
+               rdfs:comment "A site or sample may have more than one LocationInfo (e.g. multiple reported localities for the same deposit, or a sample location reported at higher precision than its parent site); no cardinality restriction is declared for this property. Domain widened to :Sample (from mo:MineralSite only) so a sample's own location -- distinct from and potentially more precise than its parent site's -- can be recorded the same way, reusing mo:LocationInfo as-is rather than a bespoke lat/lon pair."@en ;
                rdfs:label "location info"@en .
 
 
@@ -552,6 +553,15 @@ mo:unit rdf:type owl:ObjectProperty ;
                 rdfs:domain :Sample ;
                 rdfs:label "stratigraphic unit uid"@en ;
                 rdfs:comment "Unique ID (e.g., URL link) for the stratigraphic unit."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/strat_unit_name
+:strat_unit_name rdf:type owl:DatatypeProperty ;
+                  rdfs:subPropertyOf owl:topDataProperty ;
+                  rdfs:domain :Sample ;
+                  rdfs:range xsd:string ;
+                  rdfs:label "stratigraphic unit name"@en ;
+                  rdfs:comment "The stratigraphic unit as reported in the source, free text -- distinct from :strat_unit_uid, which is a normalized identifier, not a rename or replacement of it."@en .
 
 
 ###  https://geochemistry.isi.edu/ontology/strat_grouping
@@ -1103,6 +1113,51 @@ mo:zone rdf:type owl:DatatypeProperty ;
                     rdfs:range xsd:anyURI ;
                     rdfs:label "changed properties"@en ;
                     rdfs:comment "URI(s) of the property/properties changed in this edit, e.g. 'https://geochemistry.isi.edu/ontology/grade'. Same convention as mo:property on mo:Reference."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/is_deleted
+:is_deleted rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain [ rdf:type owl:Class ;
+                          owl:unionOf ( :Sample
+                                        :Analysis
+                                        :Element
+                                        mo:MineralSite
+                                      )
+                        ] ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "is deleted"@en ;
+            rdfs:comment "Soft-delete flag. The record is never removed -- this marks it as no longer active. Setting it back to false undeletes; there is no separate delete/undelete verb, it's a normal field like any other."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/deleted_by
+:deleted_by rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain [ rdf:type owl:Class ;
+                          owl:unionOf ( :Sample
+                                        :Analysis
+                                        :Element
+                                        mo:MineralSite
+                                      )
+                        ] ;
+            rdfs:range xsd:anyURI ;
+            rdfs:label "deleted by"@en ;
+            rdfs:comment "MinMod user URI of who set :is_deleted -- server-derived from the session, never client-supplied, same convention as :EditEvent's :updated_by. A dedicated field rather than reading it off :edit_history: mo:MineralSite has no edit-history mechanism at all (its own mo:created_by is a single overwritten field, by design -- see edit_history_provenance.md's rationale for why that was rejected for per-edit history), so a dedicated field keeps who/when-deleted queryable uniformly across all four classes regardless of which have richer history."@en .
+
+
+###  https://geochemistry.isi.edu/ontology/deleted_at
+:deleted_at rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain [ rdf:type owl:Class ;
+                          owl:unionOf ( :Sample
+                                        :Analysis
+                                        :Element
+                                        mo:MineralSite
+                                      )
+                        ] ;
+            rdfs:range xsd:dateTime ;
+            rdfs:label "deleted at"@en ;
+            rdfs:comment "Timestamp :is_deleted was last changed (set on delete, cleared on undelete)."@en .
 
 
 ###  https://geochemistry.isi.edu/ontology/reference
