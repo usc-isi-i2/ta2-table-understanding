@@ -10,8 +10,8 @@
 @base <https://geochemistry.isi.edu/ontology/> .
 
 <https://geochemistry.isi.edu/ontology/shacl> rdf:type owl:Ontology ;
-    rdfs:comment "SHACL shapes for the GeoChem ontology (geochem_v1.2.0.ttl)"@en ;
-    owl:versionInfo "1.2.0" ;
+    rdfs:comment "SHACL shapes for the GeoChem ontology (geochem_v1.2.1.ttl)"@en ;
+    owl:versionInfo "1.2.1" ;
     owl:imports <https://geochemistry.isi.edu/ontology/> .
 
 
